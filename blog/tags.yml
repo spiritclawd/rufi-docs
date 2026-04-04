@@ -1,0 +1,29 @@
+starknet:
+  label: Starknet
+  permalink: /starknet
+  description: Building on Starknet — Cairo, Dojo, ZK infrastructure
+
+zk:
+  label: Zero Knowledge
+  permalink: /zk
+  description: ZK proving systems, circuits, and performance
+
+guessmynft:
+  label: guessmyNFT
+  permalink: /guessmynft
+  description: On-chain deduction game built on Starknet
+
+research:
+  label: Research
+  permalink: /research
+  description: Technical research, game theory, and system design
+
+rufi:
+  label: RUFi
+  permalink: /rufi
+  description: RUFi studio — Real Utility Finance Products
+
+announcement:
+  label: Announcement
+  permalink: /announcement
+  description: Product and studio announcements

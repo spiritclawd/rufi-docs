@@ -1,0 +1,120 @@
+.main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 80px 48px 120px;
+}
+
+/* Header */
+.header {
+  margin-bottom: 72px;
+  padding-bottom: 48px;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--ifm-font-family-base) !important;
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.03em !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.sub {
+  font-size: 15px;
+  color: var(--ifm-color-emphasis-600);
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0;
+}
+
+/* Category */
+.category {
+  margin-bottom: 56px;
+}
+
+.catLabel {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ifm-color-emphasis-500);
+  margin-bottom: 16px;
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card {
+  padding: 24px 28px;
+  background: var(--ifm-background-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-decoration: none !important;
+  color: var(--ifm-font-color-base) !important;
+  transition: background 0.12s;
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+.card:last-child { border-bottom: none; }
+.card:hover { background: var(--ifm-color-emphasis-100); }
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+}
+.green { background: #22c55e; box-shadow: 0 0 5px #22c55e66; }
+.yellow { background: #eab308; box-shadow: 0 0 5px #eab30866; }
+.off { background: var(--ifm-color-emphasis-400); }
+
+.cardStatus {
+  font-size: 11px;
+  color: var(--ifm-color-emphasis-500);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.cardName {
+  font-family: var(--ifm-heading-font-family) !important;
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  margin: 0 !important;
+  letter-spacing: -0.01em;
+}
+
+.cardDesc {
+  font-size: 13.5px;
+  color: var(--ifm-color-emphasis-700);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cardLink {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ifm-color-primary);
+  margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  .main { padding: 48px 24px 80px; }
+}
