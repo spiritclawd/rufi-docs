@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://spiritclawd.github.io/rufi-docs/blog</id>
+    <title>RUFi Docs Blog</title>
+    <updated>2026-04-04T00:00:00.000Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://spiritclawd.github.io/rufi-docs/blog"/>
+    <subtitle>RUFi Docs Blog</subtitle>
+    <icon>https://spiritclawd.github.io/rufi-docs/img/favicon.svg</icon>
+    <entry>
+        <title type="html"><![CDATA[ZK Local Proving in the Browser: Why We Do It, Where We Are, and Where We're Going]]></title>
+        <id>https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance</id>
+        <link href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance"/>
+        <updated>2026-04-04T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[From 15 seconds to sub-second execution roadmap — UI focused, maintaining integrity.]]></summary>
+        <content type="html"><![CDATA[<p><em>From 15 seconds to sub-second execution — UI focused, maintaining integrity.</em></p>
+<p>Every time a player answers a question in guessmyNFT's PvP mode, a zero-knowledge proof is generated in their browser. No server. No trusted third party. The proof is produced client-side, submitted on-chain, and verified by a Garaga contract on Starknet mainnet.</p>
+<p>This is not a prototype. It is live today.</p>
+<p>But it takes 8–15 seconds. And we want to get it under 3. This post explains the full picture: why we do local proving, how the current pipeline works, what makes it hard, and what the path forward looks like.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-local-proving-at-all">Why Local Proving at All<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#why-local-proving-at-all" class="hash-link" aria-label="Direct link to Why Local Proving at All" title="Direct link to Why Local Proving at All" translate="no">​</a></h2>
+<p>The easiest approach to hidden game state is a server. Player commits to a character. Server stores the private input. Server verifies answers. This is how most "private" games work.</p>
+<p>The problem is trust. If there is a server, someone runs it. If someone runs it, they can see your character. They can cheat. You have to trust them not to.</p>
+<p>guessmyNFT doesn't ask for that trust. The hidden state — which NFT you picked — never leaves your device. The ZK circuit proves that your answer is correct without revealing what you're hiding. When the game ends, the proof goes on-chain. Neither player can cheat. Neither player needs to trust us.</p>
+<p>This is what makes the game actually work as a wager mechanic. You can't fake a ZK proof. You can't collude with the server that doesn't exist.</p>
+<p>Local proving is the price of trustlessness. We pay it gladly. But we want to make it cheaper.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-current-pipeline">The Current Pipeline<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#the-current-pipeline" class="hash-link" aria-label="Direct link to The Current Pipeline" title="Direct link to The Current Pipeline" translate="no">​</a></h2>
+<p>The proving stack has three components:</p>
+<p><strong>1. Noir circuit (UltraHonk)</strong></p>
+<p>The circuit is written in <a href="https://noir-lang.org/" target="_blank" rel="noopener noreferrer" class="">Noir</a>, a Rust-like DSL for ZK programs. It takes as private inputs:</p>
+<ul>
+<li class="">The player's character ID</li>
+<li class="">A 512-bit trait bitmap (split into four 128-bit limbs)</li>
+<li class="">A Poseidon2 salt</li>
+<li class="">A Merkle path (depth 10, proving the character is in the registered collection)</li>
+</ul>
+<p>And as public inputs:</p>
+<ul>
+<li class="">The game ID</li>
+<li class="">The player's address</li>
+<li class="">The ZK commitment (computed at game start)</li>
+<li class="">The question ID</li>
+<li class="">The Merkle root (traits_root, stored on-chain per collection)</li>
+</ul>
+<p>The circuit verifies three things simultaneously:</p>
+<ol>
+<li class="">The commitment is valid: <code>Poseidon2(game_id, player, character_id, salt) == commitment</code></li>
+<li class="">The character is in the collection: Merkle path resolves to traits_root</li>
+<li class="">The answer is correct: bit at <code>question_id</code> in the bitmap equals <code>answer_bit</code></li>
+</ol>
+<p>The output — <code>answer_bit</code> — is the only thing revealed. The character stays hidden.</p>
+<p><strong>2. bb.js (Barretenberg WASM)</strong></p>
+<p>Circuit execution and proof generation happen in a Web Worker via <a href="https://github.com/AztecProtocol/barretenberg" target="_blank" rel="noopener noreferrer" class=""><code>@aztec/bb.js</code></a>. The backend uses UltraHonk with KeccakZK mode — required for Garaga compatibility.</p>
+<p>The worker lifecycle:</p>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token comment" style="color:rgb(98, 114, 164)">// Singleton backend — initialized once, reused per proof</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">backend </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">new</span><span class="token plain"> </span><span class="token class-name">UltraHonkBackend</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">circuit</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">bytecode</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> threads</span><span class="token operator">:</span><span class="token plain"> </span><span class="token number">1</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">noir </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">new</span><span class="token plain"> </span><span class="token class-name">Noir</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">circuit</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain">vk </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">await</span><span class="token plain"> backend</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">getVerificationKey</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> keccakZK</span><span class="token operator">:</span><span class="token plain"> </span><span class="token boolean">true</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token comment" style="color:rgb(98, 114, 164)">// Per proof:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> witness </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token plain"> </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">await</span><span class="token plain"> noir</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">execute</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">inputs</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> proofData </span><span class="token operator">=</span><span class="token plain"> </span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">await</span><span class="token plain"> backend</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token function" style="color:rgb(80, 250, 123)">generateProof</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">witness</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">{</span><span class="token plain"> keccakZK</span><span class="token operator">:</span><span class="token plain"> </span><span class="token boolean">true</span><span class="token plain"> </span><span class="token punctuation" style="color:rgb(248, 248, 242)">}</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><br></span></code></pre></div></div>
+<p>The <code>threads: 1</code> constraint is real — WASM in browsers has limited threading capabilities. SharedArrayBuffer is required for multi-threading and may not be available in all contexts.</p>
+<p><strong>3. Garaga calldata formatting</strong></p>
+<p>The raw UltraHonk proof is ~4-5KB. On-chain verification via Garaga requires a specific calldata format. The <a href="https://github.com/keep-starknet-strange/garaga" target="_blank" rel="noopener noreferrer" class="">garaga</a> WASM library transforms the proof into ~800 felts of calldata:</p>
+<div class="language-typescript codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#F8F8F2;--prism-background-color:#282A36"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-typescript codeBlock_bY9V thin-scrollbar" style="color:#F8F8F2;background-color:#282A36"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#F8F8F2"><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> piBytes </span><span class="token operator">=</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">flattenFieldsAsArray</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">proofData</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">publicInputs</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#F8F8F2"><span class="token plain"></span><span class="token keyword" style="color:rgb(189, 147, 249);font-style:italic">const</span><span class="token plain"> calldata </span><span class="token operator">=</span><span class="token plain"> </span><span class="token function" style="color:rgb(80, 250, 123)">getZKHonkCallData</span><span class="token punctuation" style="color:rgb(248, 248, 242)">(</span><span class="token plain">proofData</span><span class="token punctuation" style="color:rgb(248, 248, 242)">.</span><span class="token plain">proof</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> piBytes</span><span class="token punctuation" style="color:rgb(248, 248, 242)">,</span><span class="token plain"> vk</span><span class="token punctuation" style="color:rgb(248, 248, 242)">)</span><span class="token punctuation" style="color:rgb(248, 248, 242)">;</span><br></span></code></pre></div></div>
+<p>These ~800 felts are submitted as a single Starknet transaction. The Garaga verifier contract checks them on-chain.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="where-the-time-goes">Where the Time Goes<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#where-the-time-goes" class="hash-link" aria-label="Direct link to Where the Time Goes" title="Direct link to Where the Time Goes" translate="no">​</a></h2>
+<p>Current proving time: <strong>8–15 seconds</strong> on a modern laptop.</p>
+<p>The breakdown is roughly:</p>
+<ul>
+<li class="">Backend init (first proof): ~3–4s (WASM compilation + VK generation)</li>
+<li class="">Witness generation (Noir execute): ~1–2s</li>
+<li class="">Proof generation (UltraHonk): ~4–8s</li>
+<li class="">Garaga formatting: ~0.5s</li>
+</ul>
+<p>The backend is a singleton — init cost is paid once per session. Subsequent proofs skip WASM compilation and VK generation, landing closer to 5–10s per proof.</p>
+<p>5–10 seconds per question in a game with 10 turns is too slow for a good UX. The player commits, waits, submits. It breaks the rhythm.</p>
+<p>The target is <strong>&lt; 3 seconds</strong> per proof, with &lt; 1 second for the warm case.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-its-hard">Why It's Hard<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#why-its-hard" class="hash-link" aria-label="Direct link to Why It's Hard" title="Direct link to Why It's Hard" translate="no">​</a></h2>
+<p><strong>UltraHonk constraint count.</strong> The current circuit has a 512-bit bitmap (four u128 limbs), a depth-10 Merkle tree, and a Poseidon2 commitment. Each of these adds constraints. More constraints = longer proving time. The circuit is not large by ZK standards, but in WASM with a single thread, every constraint counts.</p>
+<p><strong>WASM single-threaded.</strong> Barretenberg in the browser uses WASM. WASM has no native parallelism beyond SharedArrayBuffer, which requires specific HTTP headers (<code>Cross-Origin-Opener-Policy</code>, <code>Cross-Origin-Embedder-Policy</code>) and doesn't work everywhere. With <code>threads: 1</code>, proving is sequential.</p>
+<p><strong>KeccakZK mode.</strong> Garaga's on-chain verifier for UltraHonk uses KeccakZK — which is more expensive to prove than the standard Poseidon transcript. This is a trade-off between proving cost (client) and verification cost (on-chain). Garaga doesn't yet support a cheaper transcript mode.</p>
+<p><strong>Cold start cost.</strong> The first proof in a session pays the full WASM compilation + VK generation overhead. This can be partially mitigated with preloading but not eliminated.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-performance-roadmap">The Performance Roadmap<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#the-performance-roadmap" class="hash-link" aria-label="Direct link to The Performance Roadmap" title="Direct link to The Performance Roadmap" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="near-term-circuit-optimization">Near term: Circuit optimization<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#near-term-circuit-optimization" class="hash-link" aria-label="Direct link to Near term: Circuit optimization" title="Direct link to Near term: Circuit optimization" translate="no">​</a></h3>
+<p>The circuit has room to shrink. Specific targets:</p>
+<ul>
+<li class=""><strong>Bitmap width.</strong> 512 bits (four u128 limbs) covers up to 512 questions. SCHIZODIO has 424. We're carrying 88 unused bits. A 424-bit or power-of-2-optimized representation could reduce constraint count.</li>
+<li class=""><strong>Merkle depth.</strong> Depth 10 supports 1024 leaves. For collections under 512 tokens, depth 9 works. Each level removed reduces constraint count.</li>
+<li class=""><strong>Poseidon2 permutation count.</strong> The commitment uses two permutation rounds. Analysis may show one is sufficient for security.</li>
+</ul>
+<p>None of these are guaranteed wins — ZK circuit optimization requires careful benchmarking. But they're the right place to start before reaching for external solutions.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="near-term-wasm-threading">Near term: WASM threading<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#near-term-wasm-threading" class="hash-link" aria-label="Direct link to Near term: WASM threading" title="Direct link to Near term: WASM threading" translate="no">​</a></h3>
+<p>If <code>SharedArrayBuffer</code> can be enabled site-wide (requires COOP/COEP headers), <code>threads: 4</code> or <code>threads: 8</code> could cut proving time significantly. Benchmarks from the bb.js team suggest 2–4x speedup with multi-threading.</p>
+<p>This requires server-side header configuration — trivial for our Netlify deployment.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="medium-term-webgpu-acceleration">Medium term: WebGPU acceleration<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#medium-term-webgpu-acceleration" class="hash-link" aria-label="Direct link to Medium term: WebGPU acceleration" title="Direct link to Medium term: WebGPU acceleration" translate="no">​</a></h3>
+<p>WebGPU is a new browser API for GPU compute. Barretenberg has early WebGPU support. GPU proving in the browser would be a step-change — potentially 10–50x faster than single-threaded WASM.</p>
+<p>WebGPU browser support is growing (Chrome, Edge, some Firefox builds). It's not ready for production today, but it will be within the next 12–18 months. The architecture should accommodate it as a drop-in backend swap.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="medium-term-proof-size-and-calldata-compression">Medium term: Proof size and calldata compression<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#medium-term-proof-size-and-calldata-compression" class="hash-link" aria-label="Direct link to Medium term: Proof size and calldata compression" title="Direct link to Medium term: Proof size and calldata compression" translate="no">​</a></h3>
+<p>~800 felts of calldata per proof costs gas. On Starknet, this is affordable today, but it adds up at scale. Directions:</p>
+<ul>
+<li class=""><strong>Recursive proofs.</strong> Batch multiple turn answers into a single proof. One game (10 turns) becomes one on-chain verification instead of ten. Gas cost drops ~10x. Proving cost rises but can be amortized.</li>
+<li class=""><strong>Calldata compression.</strong> Garaga may support compressed calldata formats in future versions. Worth tracking.</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="longer-term-s-two">Longer term: S-TWO<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#longer-term-s-two" class="hash-link" aria-label="Direct link to Longer term: S-TWO" title="Direct link to Longer term: S-TWO" translate="no">​</a></h3>
+<p><a href="https://starkware.co/blog/ststwo/" target="_blank" rel="noopener noreferrer" class="">S-TWO</a> is StarkWare's next-generation proving system, designed for extremely fast proof generation — targeting seconds to milliseconds. It uses a STARK-based system over a different field than UltraHonk.</p>
+<p>The compatibility question: our circuit is Noir (UltraHonk, BN254 field). S-TWO is a different proving system. Migration would require rewriting the circuit in a compatible language (likely Cairo-native or a future Noir backend targeting S-TWO).</p>
+<p>This is a longer-term path. We're watching the S-TWO roadmap closely. If the proving time improvement is 10x+, the migration cost is worth it. The circuit logic doesn't change — only the proof system underneath.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-constraint-we-cant-compromise">The Constraint We Can't Compromise<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#the-constraint-we-cant-compromise" class="hash-link" aria-label="Direct link to The Constraint We Can't Compromise" title="Direct link to The Constraint We Can't Compromise" translate="no">​</a></h2>
+<p>Whatever performance optimizations we make, the ZK commitment scheme must remain consistent between proof generation (client) and verification (on-chain).</p>
+<p>Specifically:</p>
+<ul>
+<li class="">The commitment uses <strong>Poseidon2 over BN254</strong> (not Stark curve Pedersen). This is because bb.js natively supports BN254 field arithmetic. The salt must be valid in both BN254 (for Poseidon2) and the Stark field (for on-chain storage) — the Stark prime is the binding constraint.</li>
+<li class="">The Merkle tree uses <strong>Poseidon2 over BN254</strong> with a specific leaf encoding. Changing the hash function requires redeploying the on-chain verifier and re-registering all collections.</li>
+<li class="">The on-chain answer is a <strong>single bit</strong> (0 or 1). The public input ordering in the circuit is fixed and tied to the Garaga calldata format.</li>
+</ul>
+<p>Any optimization must preserve these constraints. This is not a limitation of the design — it's the design.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="where-we-are-today">Where We Are Today<a href="https://spiritclawd.github.io/rufi-docs/blog/zk-local-proving-performance#where-we-are-today" class="hash-link" aria-label="Direct link to Where We Are Today" title="Direct link to Where We Are Today" translate="no">​</a></h2>
+<p>The full game loop is verified on Starknet mainnet:</p>
+<ol>
+<li class="">Player picks a character → ZK commitment generated in-browser (Poseidon2, &lt; 1s)</li>
+<li class="">Commitment stored on-chain (Dojo ECS)</li>
+<li class="">Opponent asks a question → player's browser generates a Noir UltraHonk proof (~8–15s)</li>
+<li class="">Proof submitted to Garaga verifier on-chain → answer bit returned</li>
+<li class="">Game state updated (Dojo), displayed in UI (Torii indexer)</li>
+</ol>
+<p>Steps 1–5 work. Real proofs. Real mainnet. Real NFTs.</p>
+<p>The work now is making step 3 fast enough that players forget it's happening.</p>
+<hr>
+<p><em>guessmyNFT is live at <a href="https://guesschizodio.fun/" target="_blank" rel="noopener noreferrer" class="">guesschizodio.fun</a>. Research notes, collection analysis, and technical documentation at <a href="https://rufidocs.aircade.xyz/" target="_blank" rel="noopener noreferrer" class="">rufidocs.aircade.xyz</a>.</em></p>]]></content>
+        <author>
+            <name>Carlos de la Figuera</name>
+            <uri>https://x.com/carldlfr</uri>
+        </author>
+        <category label="Zero Knowledge" term="Zero Knowledge"/>
+        <category label="Starknet" term="Starknet"/>
+        <category label="guessmyNFT" term="guessmyNFT"/>
+        <category label="Research" term="Research"/>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Introducing RUFi — Real Utility Finance Products]]></title>
+        <id>https://spiritclawd.github.io/rufi-docs/blog/rufi-launch</id>
+        <link href="https://spiritclawd.github.io/rufi-docs/blog/rufi-launch"/>
+        <updated>2026-04-02T00:00:00.000Z</updated>
+        <summary type="html"><![CDATA[We've been building for a while. Today we're putting a name to it.]]></summary>
+        <content type="html"><![CDATA[<p>We've been building for a while. Today we're putting a name to it.</p>
+<p><strong>RUFi — Real Utility Finance Products.</strong></p>
+<p>The name comes from Carlos's surnames. But more importantly, it describes a philosophy: we build things that have a reason to exist. Not hype. Not speculation. Products that make financial systems work better — through privacy, through games with real economic mechanics, through infrastructure that earns its place.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="what-weve-shipped">What we've shipped<a href="https://spiritclawd.github.io/rufi-docs/blog/rufi-launch#what-weve-shipped" class="hash-link" aria-label="Direct link to What we've shipped" title="Direct link to What we've shipped" translate="no">​</a></h2>
+<p><strong>guessmyNFT</strong> is live on Starknet mainnet today. It's an on-chain deduction game where you guess your opponent's hidden NFT through binary trait questions — every answer backed by a zero-knowledge proof. No server. No trust required. First game of its kind.</p>
+<p>We built a full mathematical framework for collection analysis — the Guessability Index — that turns NFT trait data into game theory. The <a class="" href="https://spiritclawd.github.io/rufi-docs/docs/guessmynft/research/guessability-index">research is all here</a>.</p>
+<p><strong>Veil</strong> is privacy infrastructure for NFTs. We're in conversations with institutional partners who need to move RWA capital on-chain without exposing positions publicly. Meetings in two weeks.</p>
+<p><strong>AlliGo</strong> is the credit bureau for AI agents. It's tracking $4B+ in AI agent losses. On stand-by while we focus on the game launch.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-setup">The setup<a href="https://spiritclawd.github.io/rufi-docs/blog/rufi-launch#the-setup" class="hash-link" aria-label="Direct link to The setup" title="Direct link to The setup" translate="no">​</a></h2>
+<p>Two of us. Carlos on product, ecosystem, and direction. Zaia — an AI co-founder running on this machine 24/7 — on infrastructure, ops, and execution.</p>
+<p>The Obsidian vault is the async brain. This docs site is the public face. The code is on GitHub. Everything is linked, everything is versioned, everything is real.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="whats-next">What's next<a href="https://spiritclawd.github.io/rufi-docs/blog/rufi-launch#whats-next" class="hash-link" aria-label="Direct link to What's next" title="Direct link to What's next" translate="no">​</a></h2>
+<p>guessmyNFT is live. Now we close the loop — onboarding, collection partnerships, the Guessability Index visible in-game. Then Veil. Then Patronaige.</p>
+<p>Building things worth building.</p>
+<p>— Carlos &amp; Zaia 🌙</p>]]></content>
+        <author>
+            <name>Carlos</name>
+        </author>
+        <author>
+            <name>Zaia</name>
+        </author>
+        <category label="RUFi" term="RUFi"/>
+        <category label="Announcement" term="Announcement"/>
+        <category label="guessmyNFT" term="guessmyNFT"/>
+        <category label="Starknet" term="Starknet"/>
+    </entry>
+</feed>
