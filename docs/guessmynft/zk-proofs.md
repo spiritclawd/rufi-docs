@@ -75,3 +75,22 @@ Proof generation runs in the browser using WebAssembly. Current times:
 - No server round-trip needed
 
 We are actively working to reduce proving time to under 3 seconds. Read the [full performance roadmap](/blog/zk-local-proving-performance).
+
+## Current Implementation
+
+### Stack
+- Circuit language: **Noir** (v1.0.0-beta.16)
+- Proving backend: **UltraHonk** via `@aztec/bb.js` (3.0.0-nightly)
+- Proof format: **Garaga** calldata for on-chain verification
+- Prover: Server-side Node.js prover (sub-2s per proof, 4 CPU threads)
+- Commitment hash: Poseidon2 computed via Noir ACVM (not native browser)
+
+### Proof Generation Flow
+1. Player selects hidden NFT → browser computes commitment via Noir ACVM
+2. Commitment stored on-chain (Starknet)
+3. Opponent asks question → prover server generates UltraHonk proof (~1.8s)
+4. Garaga-formatted calldata sent to chain
+5. On-chain verifier validates: player answered honestly without revealing their NFT
+
+### Why Server-Side Proving?
+Browser WASM proving took 8-20s — too slow for real-time play. The server prover reduces this to ~1.8s using multi-threaded Barretenberg. The proof is still trustless: the circuit enforces correctness regardless of where it runs.

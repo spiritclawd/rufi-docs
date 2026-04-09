@@ -177,4 +177,4 @@ The work now is making step 3 fast enough that players forget it's happening.
 
 ---
 
-*guessmyNFT is live at [guesschizodio.fun](https://guesschizodio.fun). Research notes, collection analysis, and technical documentation at [rufidocs.aircade.xyz](https://rufidocs.aircade.xyz).*
+*guessmyNFT is live at [guesschizodio.fun](https://guesschizodio.fun). Research notes, collection analysis, and technical documentation at [rufidocs.aircade.xyz](https://rufistudio.github.io/RUFi-site).*

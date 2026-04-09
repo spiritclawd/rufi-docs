@@ -37,6 +37,24 @@ Veil wraps NFT transfers with ZK proofs that:
 | Aztec | ❌ | ❌ | ❌ |
 | Railgun | ❌ | ❌ | Partial |
 
+## How It Works (Simple Version)
+
+Veil wraps any NFT with a zero-knowledge proof layer:
+
+1. **Asset owner** locks their NFT (invoice, RWA, collectible) into Veil
+2. **Encrypted viewing key** is generated — only designated parties can see the underlying data
+3. **ZK proof** confirms the asset exists and is valid — without revealing what it is
+4. **Selective disclosure** — the owner decides who sees what, when
+
+To an outside observer on the public blockchain: the transaction happened. The asset moved. That's it.
+
+## Why Starknet?
+
+- STWO prover: sub-5 second proof generation (mobile-ready by late 2026)
+- Post-quantum security: STARK proofs require no trusted setup
+- Native NFT support: not retrofitted from fungible token logic
+- Already processing $1.38T in cumulative volume via StarkEx
+
 ## Status
 
 :::info Active Development

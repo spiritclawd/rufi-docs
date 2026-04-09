@@ -7,11 +7,11 @@ const config: Config = {
   tagline: 'Real Utility Finance Products — Documentation & Knowledge Base',
   favicon: 'img/favicon.svg',
 
-  url: 'https://spiritclawd.github.io',
-  baseUrl: '/rufi-docs/',
+  url: 'https://rufidocs.aircade.xyz',
+  baseUrl: '/',
 
-  organizationName: 'spiritclawd',
-  projectName: 'rufi-docs',
+  organizationName: 'RUFiStudio',
+  projectName: 'RUFi-site',
   trailingSlash: false,
 
   onBrokenLinks: 'warn',
@@ -50,12 +50,12 @@ const config: Config = {
       {property: 'og:type', content: 'website'},
       {property: 'og:title', content: 'RUFi Docs'},
       {property: 'og:description', content: 'Documentation and knowledge base for RUFi products — guessmyNFT, Veil, and AlliGo.'},
-      {property: 'og:url', content: 'https://rufidocs.aircade.xyz'},
-      {property: 'og:image', content: 'https://rufidocs.aircade.xyz/img/og-image.png'},
+      {property: 'og:url', content: 'https://rufistudio.github.io/RUFi-site'},
+      {property: 'og:image', content: 'https://rufistudio.github.io/RUFi-site/img/og-image.png'},
       {name: 'twitter:card', content: 'summary_large_image'},
       {name: 'twitter:title', content: 'RUFi Docs'},
       {name: 'twitter:description', content: 'Documentation and knowledge base for RUFi products — guessmyNFT, Veil, and AlliGo.'},
-      {name: 'twitter:image', content: 'https://rufidocs.aircade.xyz/img/og-image.png'},
+      {name: 'twitter:image', content: 'https://rufistudio.github.io/RUFi-site/img/og-image.png'},
     ],
     colorMode: {
       defaultMode: 'dark',

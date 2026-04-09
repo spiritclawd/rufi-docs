@@ -30,7 +30,7 @@ Play against an AI opponent with your results recorded on-chain via the Embeddab
 
 ## Multiplayer Mode
 
-**On-chain PvP. Real opponent. Real stakes (coming: wagering).**
+**On-chain PvP. Real opponent.**
 
 Challenge a specific wallet address or join a public room. Both players commit to hidden NFTs — ZK proofs enforce honest play throughout.
 
@@ -39,8 +39,17 @@ Challenge a specific wallet address or join a public room. Both players commit t
 - ZK-enforced answers — no lying possible
 - Winner determined on-chain
 
-## Coming: Wager Mode (Tier 3)
+## Collector Mode
 
-NFT wagering is in the spec phase. Winner takes the loser's NFT.
+**Coming soon. NFTs on the line.**
 
-Before wagering, use the [Guessability Index](/docs/guessmynft/research/guessability-index) to evaluate your NFT's strategic value. See [Wager Theory](/docs/guessmynft/research/wager-theory) for the mathematical framework.
+Collector Mode is the competitive layer of guessmyNFT. The loser of each game transfers their NFT to the winner. The winner pays a 10% claim fee — 90% of which goes directly to buying NFTs from the collection (community buybacks), with 10% going to the protocol treasury.
+
+- One NFT wagered per player
+- Winner takes the loser's NFT
+- 10% claim fee paid by the winner
+- 90% of fee → automatic collection buybacks
+- 10% of fee → protocol
+- Separate leaderboard for Collector Mode games
+
+The fee structure is designed to create a self-sustaining collection economy: every Collector Mode game returns value to the collection floor.

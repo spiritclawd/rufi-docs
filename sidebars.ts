@@ -6,6 +6,7 @@ const sidebars: SidebarsConfig = {
     'guessmynft/how-to-play',
     'guessmynft/game-modes',
     'guessmynft/zk-proofs',
+    'guessmynft/collector-mode',
     {
       type: 'category',
       label: 'For Collection Owners',
@@ -25,6 +26,9 @@ const sidebars: SidebarsConfig = {
   ],
   veilSidebar: [
     'veil/intro',
+    'veil/for-institutions',
+    'veil/competitive-landscape',
+    'veil/technical-architecture',
   ],
   alligoSidebar: [
     'alligo/intro',
