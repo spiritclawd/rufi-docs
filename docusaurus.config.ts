@@ -89,6 +89,12 @@ const config: Config = {
           position: 'left',
           label: 'AlliGo',
         },
+        {
+          type: 'docSidebar',
+          sidebarId: 'shadowVaultSidebar',
+          position: 'left',
+          label: 'Shadow Vault',
+        },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
           href: 'https://github.com/NormieLabs',
@@ -106,6 +112,7 @@ const config: Config = {
             {label: 'guessmyNFT', to: '/docs/guessmynft/intro'},
             {label: 'Veil', to: '/docs/veil/intro'},
             {label: 'AlliGo', to: '/docs/alligo/intro'},
+            {label: 'Shadow Vault', to: '/docs/shadow-vault/intro'},
           ],
         },
         {
@@ -113,6 +120,7 @@ const config: Config = {
           items: [
             {label: 'GitHub', href: 'https://github.com/NormieLabs'},
             {label: 'Play guessmyNFT', href: 'https://guesschizodio.fun'},
+            {label: 'Shadow Vault', href: 'https://spiritclawd.github.io/shadow-vault/'},
           ],
         },
         {

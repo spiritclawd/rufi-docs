@@ -36,6 +36,13 @@ const sidebars: SidebarsConfig = {
   alligoSidebar: [
     'alligo/intro',
   ],
+  shadowVaultSidebar: [
+    'shadow-vault/intro',
+    'shadow-vault/privacy-model',
+    'shadow-vault/architecture',
+    'shadow-vault/sdk',
+    'shadow-vault/business-model',
+  ],
 };
 
 export default sidebars;
