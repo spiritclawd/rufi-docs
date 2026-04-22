@@ -7,6 +7,9 @@ const sidebars: SidebarsConfig = {
     'guessmynft/game-modes',
     'guessmynft/zk-proofs',
     'guessmynft/collector-mode',
+    'guessmynft/protocol-economics',
+    'guessmynft/community-flywheel',
+    'guessmynft/expected-results',
     {
       type: 'category',
       label: 'For Collection Owners',
