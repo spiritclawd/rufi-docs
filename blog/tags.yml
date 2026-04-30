@@ -27,3 +27,18 @@ announcement:
   label: Announcement
   permalink: /announcement
   description: Product and studio announcements
+
+game-theory:
+  label: Game Theory
+  permalink: /game-theory
+  description: Game-theoretic models and analysis
+
+nft:
+  label: NFT
+  permalink: /nft
+  description: NFT-related research and documentation
+
+trait-engine:
+  label: Trait Engine
+  permalink: /trait-engine
+  description: Trait analysis, GI scoring, and collection quality metrics
