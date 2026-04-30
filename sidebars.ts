@@ -10,6 +10,8 @@ const sidebars: SidebarsConfig = {
     'guessmynft/protocol-economics',
     'guessmynft/community-flywheel',
     'guessmynft/expected-results',
+    'guessmynft/roadmap',
+    'guessmynft/skills',
     {
       type: 'category',
       label: 'For Collection Owners',
@@ -24,6 +26,14 @@ const sidebars: SidebarsConfig = {
       items: [
         'guessmynft/research/guessability-index',
         'guessmynft/research/wager-theory',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Trait Engine',
+      items: [
+        'guessmynft/trait-engine/index',
+        'guessmynft/trait-engine/theory',
       ],
     },
   ],
