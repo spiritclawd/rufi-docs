@@ -29,9 +29,9 @@ import TabItem from '@theme/TabItem';
   <TabItem value="wallet" label="Play On-chain">
 
 1. Connect your **Cartridge Controller** wallet
-2. Choose **Solo Mode** (vs AI) or **Multiplayer** (vs a friend)
-3. Commit to a hidden NFT — ZK proof generated in your browser
-4. Play — every answer is verified on-chain
+2. Choose **Solo → Random** (no NFT) or **Solo → Owned** (NFT required)
+3. Face the Schizodio Boss — ask trait questions, receive ZK-proven answers
+4. Guess correctly to score against par on the eternal leaderboard
 
   </TabItem>
 </Tabs>
@@ -41,8 +41,14 @@ import TabItem from '@theme/TabItem';
 | Mode | On-chain | Wallet | Stakes |
 |------|----------|--------|--------|
 | **Practice** | ❌ | ❌ | None — just for fun |
-| **Solo** | ✅ | ✅ | Leaderboard score |
+| **Solo Random** | ✅ | ✅ | Leaderboard score + NFT prizes |
+| **Solo Owned** | ✅ | ✅ (NFT required) | Leaderboard score + USDC prizes |
 | **Multiplayer** | ✅ | ✅ | None (coming: NFT wagers) |
+| **Tournaments** | ✅ | ✅ | Time-bounded events with prizes |
+
+Solo Mode features two access modes — **Random** (no NFT needed, earn your way in) and **Owned** (NFT required, higher stakes). Both use golf-par scoring against the Schizodio Boss. [Learn more →](/docs/guessmynft/solo-mode/)
+
+**Tournaments** are competitive seasons on the eternal Solo leaderboards. The Schizodio Inauguration Tournament is the first event. [Learn more →](/docs/guessmynft/tournaments/)
 
 ## How it Works
 

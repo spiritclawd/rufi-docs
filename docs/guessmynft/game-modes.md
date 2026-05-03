@@ -1,7 +1,7 @@
 ---
 id: game-modes
 title: Game Modes
-sidebar_position: 4
+sidebar_position: 5
 ---
 
 # Game Modes
@@ -19,14 +19,23 @@ Practice Mode runs entirely client-side with a randomized opponent. Perfect for 
 
 ## Solo Mode
 
-**On-chain. Wallet required. Leaderboard-eligible.**
+**On-chain. One player. One Boss. Golf-par scoring.**
 
-Play against an AI opponent with your results recorded on-chain via the Embeddable Game Standard (EGS). Scores go to the global leaderboard.
+Play against the Schizodio Boss — an AI opponent whose hidden NFT is selected by difficulty-weighted math. Every answer is ZK-proven on-chain. Your score is measured against par and recorded on the eternal leaderboard.
+
+Two access modes:
+
+- **Random** — login required, no NFT ownership. Boss picked from the full collection. The onboarding path — earn NFT prizes, unlock Owned mode.
+- **Owned** — login + NFT ownership. Boss picked from the collection minus your committed NFT. Strategic depth — your choice shapes the candidate space.
+
+Scoring uses **golf-par**: `par = ceil(log2(candidate_space))`, your score = questions used. Lower is better. Wrong guess = no leaderboard entry.
+
+Each NFT displays a **GI tier badge** (LOW / MEDIUM / HIGH / CRITICAL) indicating how hard it is to identify. See [Solo Mode](/docs/guessmynft/solo-mode/) for full details and the [Trait Engine](/docs/guessmynft/trait-engine/) for the underlying math.
 
 - Cartridge Controller wallet required
 - Results recorded on-chain
-- Leaderboard via denshokan-sdk
-- Separate leaderboards per collection
+- Separate eternal leaderboards per (collection × mode)
+- GI tier badges on every NFT
 
 ## Multiplayer Mode
 
@@ -53,3 +62,13 @@ Collector Mode is the competitive layer of guessmyNFT. The loser of each game tr
 - Separate leaderboard for Collector Mode games
 
 The fee structure is designed to create a self-sustaining collection economy: every Collector Mode game returns value to the collection floor.
+
+## Tournaments
+
+**Time-bounded competitive events on the eternal Solo leaderboards.**
+
+Tournaments are seasons stacked on the permanent Solo Mode leaderboards. Play during the tournament window, rank on the leaderboard, win prizes. After the tournament ends, the leaderboard persists forever.
+
+The **Schizodio Inauguration Tournament** is the first event — 7 days, no entry fee, NFT prizes for Random mode, $100 USDC pool for Owned mode.
+
+See [Tournaments](/docs/guessmynft/tournaments/) for full details and prize breakdowns.

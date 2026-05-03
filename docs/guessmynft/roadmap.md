@@ -14,11 +14,13 @@ This page is a living document. It changes as we learn, ship, and recalibrate.
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Practice Mode | ✅ Live | No wallet, instant play, AI opponent |
-| Solo Mode | ✅ Live | On-chain, Cartridge Controller, leaderboard |
+| Solo Mode V1 | ✅ Live | Open + Owned modes, golf-par scoring, Schizodio Boss |
 | Multiplayer (PvP) | ✅ Live | ZK-enforced, no lying possible |
 | Schizodio Collection | ✅ Live | 999 Chizos, first canonical set |
 | Stats Dashboard | ✅ Live | Real-time on-chain data at stats.guesschizodio.fun |
 | ZK Prover | ✅ Live | Noir + UltraHonk via bb.js, Garaga verifier |
+| GI Tier Badges | ✅ Live | LOW / MEDIUM / HIGH / CRITICAL on every NFT |
+| Schizodio Inauguration | 🔜 Launching | First tournament — 7 days, NFT + USDC prizes |
 
 ## Next — Depth
 
@@ -28,9 +30,10 @@ This page is a living document. It changes as we learn, ship, and recalibrate.
 - **Community tournaments** — weekly events with leaderboard prizes
 - **Discord bot** — match alerts, stats, collection rankings
 
-### Solo Mode Evolution
-- **Bosses per collection** — unique AI personalities per collection (Aggressive, Defensive, Adaptive, Greedy)
-- **Difficulty tiers** — Easy → Hard → Impossible, each with different question limits
+### Solo Mode Expansion
+- **Bloberts + Ducks collections** — new Bosses, new leaderboards, new tournaments
+- **Best-score-per-player aggregation** — personal bests across attempts (pending retry policy)
+- **GI rework** — refined difficulty scoring for Boss selection and UI badges
 - **Speed run mode** — time-limited matches, separate leaderboard
 
 ### Collector Mode Expansion

@@ -4,6 +4,8 @@ const sidebars: SidebarsConfig = {
   guessmynftSidebar: [
     'guessmynft/intro',
     'guessmynft/how-to-play',
+    'guessmynft/solo-mode',
+    'guessmynft/tournaments',
     'guessmynft/game-modes',
     'guessmynft/zk-proofs',
     'guessmynft/collector-mode',
