@@ -14,6 +14,7 @@ const sidebars: SidebarsConfig = {
     'guessmynft/expected-results',
     'guessmynft/roadmap',
     'guessmynft/skills',
+    'guessmynft/faq',
     {
       type: 'category',
       label: 'For Collection Owners',
